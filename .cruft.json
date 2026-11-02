@@ -1,0 +1,31 @@
+{
+  "template": "https://gitlab.com/unitelabs/cdk/connector-factory.git",
+  "commit": "d43aa323a610da3eec05ed0a8d4458254630f576",
+  "checkout": "main",
+  "context": {
+    "cookiecutter": {
+      "connector_name": "Applied Biosystems Automated Thermal Cycler",
+      "project_name": "applied-biosystems-atc",
+      "package_name": "applied_biosystems_atc",
+      "__package_import_name": "unitelabs.applied_biosystems_atc",
+      "__protocol_name": "AppliedBiosystemsAtc",
+      "project_description": "A SiLA 2 connector, built on the UniteLabs CDK, for the Applied Biosystems Automated Thermal Cycler (ATC).",
+      "author_full_name": "Kozo Nishida",
+      "author_email": "knishida@riken.jp",
+      "project_repo": "https://github.com/plan5-labs/atc-sila2-connector",
+      "communication_type": "none",
+      "env": "uv",
+      "_render_devdocs": false,
+      "_jinja2_env_vars": {
+        "lstrip_blocks": true,
+        "trim_blocks": true
+      },
+      "_extensions": [
+        "internal_ext.IsInternalExtension"
+      ],
+      "_template": "https://gitlab.com/unitelabs/cdk/connector-factory.git",
+      "_commit": "d43aa323a610da3eec05ed0a8d4458254630f576"
+    }
+  },
+  "directory": null
+}
