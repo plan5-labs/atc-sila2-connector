@@ -120,6 +120,8 @@ uv run ruff format src/ && uv run ruff check src/ --fix
 
 To reload the connector whenever a source file changes, run `uv run connector dev`.
 
+GitHub Actions (`.github/workflows/tests.yml`) runs the lint checks and the tests on every pull request and on pushes to `main`. The tests run on Ubuntu and Windows, with Python 3.10 and 3.14.
+
 The tests run against the simulated command executor. `tests/features/test_automated_thermal_cycler_controller.py` compares the feature definition the connector serves with the one of the C# server, in `tests/features/AutomatedThermalCyclerController-v1_0.sila.xml`. Keep that test passing to stay compatible with existing clients.
 
 ### Project layout
