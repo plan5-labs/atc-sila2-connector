@@ -6,6 +6,7 @@ from sila.framework import DefinedExecutionError
 
 from tests.conftest import PROTOCOL_FILE
 from tests.features.conftest import run
+from unitelabs.applied_biosystems_atc.features.simulation_controller import SimulationController
 
 FEATURE = "org.riken/instruments/AutomatedThermalCyclerController/v1"
 
@@ -128,9 +129,20 @@ class TestRun:
         await run(atc.StartRun)
 
         assert await anext(statuses) == 2
-        assert (await atc.GetInstrumentState()).InstrumentState == 2
         assert await anext(statuses) == 1
         statuses.close()
+
+    async def test_reports_instrument_state_during_run(self, connector, client):
+        connector.get_feature(SimulationController).simulator.run_duration = 1000
+        atc = client.AutomatedThermalCyclerController
+        await run(atc.Load, ProtocolFileData=PROTOCOL_FILE)
+        await run(atc.Validate, MaxSampleVolume=0.0)
+        await run(atc.CloseLid)
+
+        await run(atc.StartRun)
+
+        assert (await atc.GetInstrumentState()).InstrumentState == 2
+        await run(atc.StopRun)
 
     async def test_streams_run_time(self, client):
         atc = client.AutomatedThermalCyclerController

@@ -134,11 +134,14 @@ class TestLid:
 
     async def test_runs_lid_commands_one_at_a_time(self, protocol, simulator):
         simulator.lid_duration = 20
+        lid_motion = simulator.lid_duration * simulator.time_scale
 
         started = asyncio.get_running_loop().time()
         await asyncio.gather(protocol.open_lid(), protocol.close_lid())
 
-        assert asyncio.get_running_loop().time() - started >= 2 * 20 * simulator.time_scale
+        # Two lid motions one after the other take about twice as long as one. Allow for the coarse
+        # clock on Windows.
+        assert asyncio.get_running_loop().time() - started >= 1.5 * lid_motion
 
 
 class TestStartRun:
@@ -160,7 +163,6 @@ class TestStartRun:
         await protocol.start_run()
 
         assert await statuses.get(timeout=TIMEOUT) is Status.RUNNING
-        assert await protocol.get_instrument_state() is InstrumentState.RUNNING
         assert await statuses.get(timeout=TIMEOUT) is Status.IDLE
         await protocol.remaining_time.wait_for(lambda value: not value, timeout=TIMEOUT, replay=Replay.CURRENT)
         assert protocol.elapsed_time.current == datetime.timedelta(0)
@@ -170,6 +172,14 @@ class TestStartRun:
             values.append(await remaining_times.get())
         assert values[0] == datetime.timedelta(seconds=5)
         assert values[-2:] == [datetime.timedelta(seconds=1), datetime.timedelta(0)]
+
+    async def test_reports_running_instrument_state(self, protocol, simulator):
+        simulator.run_duration = 1000
+        await prepare_run(protocol)
+
+        await protocol.start_run()
+
+        assert await protocol.get_instrument_state() is InstrumentState.RUNNING
 
     async def test_fails_with_lid_open(self, protocol):
         await protocol.load(PROTOCOL_FILE)

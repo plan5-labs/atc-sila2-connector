@@ -27,7 +27,7 @@ async def wait_for_status(protocol: AutomatedThermalCyclerProtocol, status: Stat
 def fast_timeouts(monkeypatch):
     """Shorten the waits of the protocol, so tests about unreachable command executors stay fast."""
 
-    monkeypatch.setattr(protocol_module, "OPEN_TIMEOUT", 0.5)
+    monkeypatch.setattr(protocol_module, "OPEN_TIMEOUT", 2.0)
     monkeypatch.setattr(protocol_module, "RESUBSCRIBE_DELAY", 0.05)
 
 

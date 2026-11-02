@@ -51,7 +51,10 @@ dev = [
 pythonpath = ["src"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "function"
+# One event loop for all tests, like a running connector: on Windows, grpc.aio stays bound to
+# the event loop it started on and stops delivering events once that loop is closed.
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 addopts = "--color=yes"
 
 [tool.ruff]
