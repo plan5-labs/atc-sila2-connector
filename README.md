@@ -96,7 +96,7 @@ The SiLA interface is unchanged. The connector behaves differently in these deli
 - **Commands run one at a time.** The C# server forwarded concurrent commands to the command executor in parallel. The executor keeps the loaded protocol and the status in shared state, so the connector waits for one command to finish before it forwards the next. `GetInstrumentState` doesn't wait.
 - **Clearer error for an unreachable executor.** If the command executor can't be reached, commands fail with `NotInitialized` (the C# server used `InstrumentErrorOccurred`). A command that takes longer than 300 seconds fails with `InstrumentErrorOccurred`.
 - **No 24-hour rollover.** `ElapsedTime` and `RemainingTime` keep counting hours past 24. The C# server rolled over to `00:00:00`.
-- **One subscription per stream.** The connector holds one subscription per command executor stream and shares it among all SiLA clients. The executor serves all subscribers of a stream from one queue, so two direct subscribers would each get only part of the updates.
+- **One subscription per stream.** The connector holds one subscription per command executor stream, shares it among all SiLA clients, and cancels it when it's no longer needed. The C# server opened one executor stream per SiLA subscription, so two SiLA clients could interfere with each other (see [Command executor behavior](#command-executor-behavior)). It also left the executor stream open after the SiLA client unsubscribed ([atc-sila2#3](https://github.com/plan5-labs/atc-sila2/issues/3)).
 - **New feature.** The `SimulationController` feature is added.
 - **Different defaults.** TLS is off, and the server name and type differ (see [Configure](#configure)).
 
@@ -105,8 +105,13 @@ The SiLA interface is unchanged. The connector behaves differently in these deli
 The connector relays the following behavior of the command executor unchanged, in real and simulation mode:
 
 - **Status is re-derived before each command.** Before every command except `GetInstrumentState`, the executor derives `Status` from the instrument state. After a failed lid or run command sets `Status` to `3` (Error), the next command resets it to `1` (Idle) if the instrument reports idle.
-- **`Reset` can't currently succeed.** Its status check passes only while the instrument itself reports an error. In that case, `Reset` fails with "The instrument error has not been resolved." Fixing this needs a change in the command executor.
+- **`Reset` can't currently succeed.** Its status check passes only while the instrument itself reports an error. In that case, `Reset` fails with "The instrument error has not been resolved." Fixing this needs a change in the command executor ([atc-sila2#1](https://github.com/plan5-labs/atc-sila2/issues/1)).
 - **`Status` isn't polled.** It changes only on commands and on run events.
+
+The executor's streams also have bugs that show only in real mode, because the simulated executor doesn't reproduce them ([atc-sila2#2](https://github.com/plan5-labs/atc-sila2/issues/2)):
+
+- **Subscribers of the same stream cancel each other.** Don't run another client of the command executor, such as the C# server, alongside the connector. If the connector's status stream is cancelled, the connector reports `NotConnected` for about 5 seconds, until it subscribes again.
+- **Elapsed-time subscriptions leak.** Each time the connector restarts while the executor stays connected to the ATC, the executor keeps one more elapsed-time handler. After a restart, `ElapsedTime` can briefly replay stale values.
 
 ## Development
 
