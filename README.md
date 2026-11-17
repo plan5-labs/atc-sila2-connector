@@ -160,3 +160,7 @@ The generated code requires at least the grpcio-tools and protobuf versions it w
 ### Template updates
 
 The project follows the UniteLabs [connector-factory](https://gitlab.com/unitelabs/cdk/connector-factory) template, recorded in `.cruft.json`. To pull in later template changes, run `cruft update`.
+
+## License
+
+MIT License. Copyright (c) 2025-2026 RIKEN. See [LICENSE](LICENSE).
