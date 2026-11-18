@@ -1,5 +1,10 @@
 # Applied Biosystems Automated Thermal Cycler
 
+> ⚠️ **Disclaimer**: This software is under active development. It comes with
+> **no warranty** and the authors accept **no liability** for any results or
+> damages. Use at your own risk, and verify safety before connecting to real
+> hardware.
+
 A SiLA 2 connector, built on the [UniteLabs CDK](https://gitlab.com/unitelabs/cdk/python-cdk), for the Applied Biosystems Automated Thermal Cycler (ATC), model A31487 by Thermo Fisher Scientific.
 
 The connector is a Python port of the C# SiLA server in [plan5-labs/atc-sila2](https://github.com/plan5-labs/atc-sila2). It serves the same `AutomatedThermalCyclerController` feature, with the same identifiers, data types and errors, so existing SiLA clients keep working. It drives the instrument through the same command executor.
